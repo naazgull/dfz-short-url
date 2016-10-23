@@ -1,6 +1,6 @@
 
 AC_PREREQ(2.59)
-AC_INIT(dfz-short-url, 0.0.1-1, pedro.figueiredo@gmail.com)
+AC_INIT(dfz-short-url, 1.0.0-1, pedro.figueiredo@gmail.com)
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([.])

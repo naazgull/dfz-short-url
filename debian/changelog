@@ -1,3 +1,9 @@
+dfz-short-url (1.0.0-1) trusty; urgency=medium
+
+  * Version bump
+
+ -- n@zgul <pedro.figueiredo@gmail.com>  Sun, 23 Oct 2016 20:14:04 +0100
+
 dfz-short-url (0.0.1-1) trusty; urgency=medium
 
   * Initial release.
