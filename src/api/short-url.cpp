@@ -4,40 +4,62 @@ Copyright (c) 2016
 
 #include <dfz/short-url/short-url.h>
 
-extern "C" void restify(zpt::EventEmitterPtr _emitter) {
-	// See short-url.lambda.cpp and short-url.oo.cpp for examples on 
-	// how to create endpoints with lambda pattern and object-oriented pattern, respectively.
-	
+extern "C" void restify(zpt::EventEmitterPtr _emitter) {	
 	// Setup a Redis connection
 	zpt::KBPtr _kb(new zpt::redis::Client(_emitter->options(), "redis.short-url"));
 	_emitter->add_kb("redis.short-url", _kb);
 
-	_emitter->on(zpt::rest::url_pattern({ _emitter->version(), "{collection-name}" }),
+	_emitter->on(zpt::rest::url_pattern({ _emitter->version(), "short-urls" }),
 		{
 			{
 				zpt::ev::Get,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
-					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					zpt::json _list;
 
+					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					_list = _db->query("short-urls", (!_envelope["payload"]->ok() || _envelope["payload"]->obj()->size() == 0 ? std::string("*") : std::string("*") + ((std::string) _envelope["payload"]->obj()->begin()->second) + std::string("*")));
+					
+					if (!_list->ok() || _list["size"] == 0) {
+					 	return { "status", 204 };
+					}
 					return {
 						"status", 200,
-						"payload", {
-							"text", "some response"
-						}
+						"payload", _list
 					};
 				}
 			},
 			{
 				zpt::ev::Post,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
-					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					assertz(
+						_envelope["payload"]->ok() &&
+						_envelope["payload"]["target"]->ok(),
+						"required fields: 'target'", 412, 0);
+					assertz(
+						_envelope["payload"]["target"]->type() == zpt::JSString,
+						"invalid field type: 'target' must be a string", 400, 0);
 
+					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					std::string _id;
+					std::string _href;
+					std::string _url;
+					
+					do {
+						zpt::generate_key(_id, 8);
+						_href.assign(_resource + (_resource.back() != '/' ? std::string("/") : std::string("")) + _id);
+						_url.assign(_emitter->options()["prefix"]->str() + (_emitter->options()["prefix"]->str().back() != '/' ? std::string("/") : std::string("")) + _id);
+					}
+					while(_db->get("short-urls", _href)->ok());
+					
+					_envelope["payload"] << "id" << _id << "url" << _url;
+					_id = _db->insert("short-urls", _resource, _envelope["payload"]);
+					
 					return {
 						"status", 200,
 						"payload", {
-							"text", "some response"
+							"id", _id,
+							"url", _url,
+							"href", _href
 						}
 					};
 				}
@@ -45,13 +67,18 @@ extern "C" void restify(zpt::EventEmitterPtr _emitter) {
 			{
 				zpt::ev::Head,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
+					zpt::json _list;
+					
 					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
-
+					_list = _db->query("short-urls", (!_envelope["payload"]->ok() || _envelope["payload"]->obj()->size() == 0 ? std::string("*") : std::string("*") + ((std::string) _envelope["payload"]->obj()->begin()->second) + std::string("*")));
+					
+					if (!_list->ok()) {
+					 	return { "status", 204 };
+					}
 					return {
 						"status", 200,
 						"headers", {
-							"Content-Length", 24
+							"Content-Length", ((std::string) _list).length()
 						}
 					};
 				}
@@ -59,32 +86,47 @@ extern "C" void restify(zpt::EventEmitterPtr _emitter) {
 		}
 	);
 
-	_emitter->on(zpt::rest::url_pattern({ _emitter->version(), "{collection-name}", "([^/]+)" }),
+	_emitter->on(zpt::rest::url_pattern({ _emitter->version(), "short-urls", "([^/]+)" }),
 		{
 			{
 				zpt::ev::Get,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
-					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					zpt::json _document;
 
+					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					_document = _db->get("short-urls", _resource);
+					if (!_document->ok()) {
+						return { "status", 404 };
+					}
+					
 					return {
 						"status", 200,
-						"payload", {
-							"text", "some response"
-						}
+						"payload", _document
 					};
 				}
 			},
 			{
 				zpt::ev::Put,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
-					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					assertz(
+						_envelope["payload"]->ok() &&
+						_envelope["payload"]["a"]->ok() &&
+						_envelope["payload"]["b"]->ok() &&
+						_envelope["payload"]["b"]->ok(),
+						"required fields: 'a', 'b' and 'c'", 412, 0);
+					assertz(
+						_envelope["payload"]["c"]->type() == zpt::JSArray,
+						"invalid field type: 'c' must be a list of strings", 400, 0);
 
+					size_t _size = 0;
+					
+					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					_size = _db->save("short-urls", _resource, _envelope["payload"]);
+					
 					return {
 						"status", 200,
 						"payload", {
-							"text", "some response"
+							"updated", _size
 						}
 					};
 				}
@@ -92,13 +134,15 @@ extern "C" void restify(zpt::EventEmitterPtr _emitter) {
 			{
 				zpt::ev::Delete,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
+					size_t _size = 0;
+
 					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					_size = _db->remove("short-urls", _resource);
 
 					return {
 						"status", 200,
 						"payload", {
-							"text", "some response"
+							"removed", _size
 						}
 					};
 				}
@@ -106,13 +150,18 @@ extern "C" void restify(zpt::EventEmitterPtr _emitter) {
 			{
 				zpt::ev::Head,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
-					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					zpt::json _document;
 
+					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					_document = _db->get("short-urls", _resource);
+					if (!_document->ok()) {
+						return { "status", 404 };
+					}
+					
 					return {
 						"status", 200,
 						"headers", {
-							"Content-Length", 24
+							"Content-Length", ((std::string) _document).length()
 						}
 					};
 				}
@@ -120,18 +169,47 @@ extern "C" void restify(zpt::EventEmitterPtr _emitter) {
 			{
 				zpt::ev::Patch,
 				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
-					// Get Redis connection
+					size_t _size = 0;
+
 					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					_size = _db->set("short-urls", _resource, _envelope["payload"]);
 
 					return {
 						"status", 200,
 						"payload", {
-							"text", "some response"
+							"updated", _size
 						}
 					};
 				}
 			}
 		}
 	);
+
+	_emitter->on(zpt::rest::url_pattern({ _emitter->version(), "short-urls", "get", "([^/]+)" }),
+		{
+			{
+				zpt::ev::Get,
+				[] (zpt::ev::performative _performative, std::string _resource, zpt::json _envelope, zpt::ev::emitter _emitter) -> zpt::json {
+					
+					zpt::redis::Client* _db = (zpt::redis::Client*) _emitter->get_kb("redis.short-url").get();
+					zpt::replace(_resource, "/get", "");
+					zpt::json _url;
+					if ((_url = _db->get("short-urls", _resource))->ok()) {
+						return {
+							"status", 301,
+							"headers", {
+								"Location", _url["target"]
+							}
+						};
+					}
+					
+					return {
+						"status", 404
+					};
+				}
+			}
+		}
+	);
+
 }
 

@@ -5,5 +5,4 @@ nobase_dist_sysconf_DATA = \
 ./zapata/backend-available/dfz-short-url.conf \
 ./zapata/conf.d/dfz-short-url/api.conf \
 ./zapata/conf.d/dfz-short-url/files.conf \
-./zapata/conf.d/dfz-short-url/redis.conf \
-./zapata/conf.d/dfz-short-url/mongodb.conf
+./zapata/conf.d/dfz-short-url/redis.conf
