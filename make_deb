@@ -8,12 +8,12 @@ do
     no_revision_prefix=${prefix%-*}
     version=${no_revision_prefix##*-}
     no_version_prefix=${no_revision_prefix%-*}
-    orig=../upstream/$no_version_prefix\_$version.orig.tar.gz
-    mkdir -p ../upstream
-    rm -rfv ../upstream/*
+    orig=upstream/$no_version_prefix\_$version.orig.tar.gz
+    mkdir -p upstream
+    rm -rfv upstream/*
     echo "processing $orig"
     cp -rf $f $orig
-    pushd ../upstream/
+    pushd upstream/
     tar xvzf $no_version_prefix\_$version.orig.tar.gz
     pushd $prefix/
     debuild -us -uc
@@ -21,8 +21,8 @@ do
     then
 	exit -1
     fi
-    mkdir -p ../../packages/$(lsb_release -sc)
-    sudo mv ../$no_version_prefix\_$version-$revision\_amd64.deb ../../packages/$(lsb_release -sc)/binary-amd64
+    mkdir -p ../../packages/$(lsb_release -sc)/binary-amd64
+    sudo mv ../$no_version_prefix\_$version-$revision\_amd64.deb ../../packages/$(lsb_release -sc)/binary-amd64/
     if [[ $? != 0 ]]
     then
 	exit -1
