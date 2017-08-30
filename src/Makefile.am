@@ -1,2 +1,2 @@
 
-EXTRA_DIST = dfz
+EXTRA_DIST = dfz/

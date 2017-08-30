@@ -1,0 +1,23 @@
+{
+	"name" : "dfz-short-url",
+	"abbr" : "short-url",
+	"prefix" : "dfz/",
+	"developer" : { "name" : "n@zgul", "email" : "n@zgul.me" },
+	"version" : [ 0, 0, 1 ],
+	
+	"prefix-cxx" : [ "src" ],
+	"prefix-h" : [ "include" ],
+	"prefix-scripts" : [ "src" ],
+	"force-makefile" : [ false ],
+
+	"data-out-cxx" : [ "src" ],
+	"data-out-h" : [ "include/dfz/short-url" ],
+	"force-data" : [ false ],
+
+	"resource-out-cxx" : [ "src" ],
+	"resource-out-h" : [ "include/dfz/short-url" ],
+	"resource-out-scripts" : [ "src/dfz/short-url" ],
+	"force-resource" : [ false ],
+	
+	"force-doc" : [ false ]
+}

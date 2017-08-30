@@ -1,0 +1,26 @@
+{
+	"lib" : "dfz-short-url-container",
+	"name" : "container",
+	"namespace" : "short-url::container",
+	"resources" : [
+		{
+			"topic" : "/v2/container",
+			"type" : "collection",
+			"name" : "containers",
+			"performatives" : [ "get", "post", "patch", "delete", "head" ],
+			"protocols" : [ "http", "mqtt", "0mq", "amqp" ],
+			"datum" : { "name" : "short-url::DataSet" }
+		}
+	],
+	"datums" : [
+		{
+			"name" : "DataSet",
+			"dbms" : [ "postgresql", "mongodb", "redis" ],
+			"fields" : {
+				"type" : { "type" : "ascii", "opts" : [ "mandatory", "index" ] },
+				"created" : { "type" : "timestamp", "opts" : [ "auto", "mandatory" ] },
+				"updated" : { "type" : "timestamp", "opts" : [ "auto", "mandatory" ] }
+			}
+		}
+	]
+}
