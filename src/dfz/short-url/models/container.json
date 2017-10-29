@@ -1,25 +1,25 @@
 {
-	"lib" : "dfz-short-url-container",
+	"lib" : "dfz-short-url",
 	"name" : "container",
-	"namespace" : "short-url::container",
+	"namespace" : "dfz::short_url",
 	"resources" : [
 		{
-			"topic" : "/v2/container",
+			"topic" : "/1.0/urls",
 			"type" : "collection",
-			"name" : "containers",
+			"name" : "urls",
 			"performatives" : [ "get", "post", "patch", "delete", "head" ],
-			"protocols" : [ "http", "mqtt", "0mq", "amqp" ],
-			"datum" : { "name" : "short-url::DataSet" }
+			"protocols" : [ "http", "0mq", "amqp" ],
+			"datum" : { "name" : "dfz::short_url::Urls" }
 		}
 	],
 	"datums" : [
 		{
-			"name" : "DataSet",
-			"dbms" : [ "postgresql", "mongodb", "redis" ],
+			"name" : "Urls",
+			"dbms" : [ "mysql", "couchdb" ],
+			"index_type" : "hash",
 			"fields" : {
-				"type" : { "type" : "ascii", "opts" : [ "mandatory", "index" ] },
-				"created" : { "type" : "timestamp", "opts" : [ "auto", "mandatory" ] },
-				"updated" : { "type" : "timestamp", "opts" : [ "auto", "mandatory" ] }
+				"params" : { "type" : "json" },
+				"method" : { "type" : "ascii", "opts" : [ "mandatory" ] }
 			}
 		}
 	]

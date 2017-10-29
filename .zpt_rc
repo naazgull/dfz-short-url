@@ -12,7 +12,7 @@
 
 	"data-out-cxx" : [ "src" ],
 	"data-out-h" : [ "include/dfz/short-url" ],
-	"force-data" : [ false ],
+	"force-data" : [ true ],
 
 	"resource-out-cxx" : [ "src" ],
 	"resource-out-h" : [ "include/dfz/short-url" ],

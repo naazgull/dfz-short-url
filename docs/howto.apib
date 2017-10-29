@@ -1,0 +1,166 @@
+FORMAT: 1A
+HOST: https://api.something.something/
+
+# SHORT-URL CONTAINER
+
+# CONTAINER
+
+
+
+## DATUMS
+
+### Urls
+
+---
+
+(in _dfz::short_url_)
+
+
+
+#### Supported DBMS:
+
+- mysql
+- couchdb
+
+
+| FIELD | TYPE | DESCRIPTION |
+|:------|:----:|:-------|
+| _**id**_ | hash | Primary key and index. This field is: _mandatory; index; primary-key_ |
+| _**href**_ | uri | Record access URI. This field is: _mandatory_ |
+| _**method**_ | ascii |  This field is _mandatory_. |
+| _**params**_ | json |  |
+| _**created**_ | timestamp | Record creation timestamp. This field is: _mandatory; auto_ |
+| _**updated**_ | timstamp | Record update timestamp. This field is: _mandatory; auto_ |
+
+
+
+# Group API
+
+
+
+## URLS COLLECTION [/1.0/urls{?page_size,page_start_index,order_by,fields}]
+
+(in _dfz::short_url_)
+
+
+
+### Allowed protocols:
+
+- http
+- 0mq
+- amqp
+
+### Datum
+
+| FIELD | TYPE | DESCRIPTION |
+|:------|:----:|:-------|
+| _**id**_ | uuid | Primary key and index. |
+| _**method**_ | ascii |  This field is _mandatory_. |
+| _**params**_ | json |  |
+
+
+### Retrieve  urls [GET]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer asdnofiudifunaoisduf2839sdfd23
+
++ Response 200 (application/json)
+
+        {
+        "size" : 43,
+        "elements" : [
+            {
+                  "id" : "5eabe36a-bccf-11e7-9aa7-bb30a795d8b6",
+                  "href" : "/1.0/urls/5eabe36a-bccf-11e7-9aa7-bb30a795d8b6",
+                  "created" : "2017-10-29T17:34:09.066+0000",
+                  "updated" : "2017-10-29T17:34:09.066+0000",
+                  "method" : "METHOD",
+                  "params" : { }
+            },
+            {
+                  "id" : "5eabe36a-bccf-11e7-9aa7-bb30a795d8b6",
+                  "href" : "/1.0/urls/5eabe36a-bccf-11e7-9aa7-bb30a795d8b6",
+                  "created" : "2017-10-29T17:34:09.066+0000",
+                  "updated" : "2017-10-29T17:34:09.066+0000",
+                  "method" : "METHOD",
+                  "params" : { }
+            }
+        ]
+        }
+
+### Create new  urls [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer asdnofiudifunaoisduf2839sdfd23
+
+    + Body
+
+            {
+                    "method":"METHOD",
+                    "params":{ }
+            }
+
++ Response 201 (application/json)
+
+        {
+                "id":"{id}",
+                "href":"/1.0/urls"
+        }
+
+
+### Update  urls [PATCH]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer asdnofiudifunaoisduf2839sdfd23
+
+    + Body
+
+            {
+                     "method":"METHOD",
+                     "params":{ }
+            }
+
++ Response 201 (application/json)
+
+        {
+                "n_updated":1,
+                "href":"/1.0/urls",
+        }
+
+
+### Remove  urls [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer asdnofiudifunaoisduf2839sdfd23
+
++ Response 200 (application/json)
+
+        {
+                "n_deleted":43,
+                "href":"/1.0/urls",
+        }
+
+
+### Test existance of  urls [HEAD]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer asdnofiudifunaoisduf2839sdfd23
+
++ Response 200 (application/json)
+
+
